@@ -132,7 +132,7 @@
             updateUI(isEnabled);
             return isEnabled;
         }
-         
+        
         // Save switch state to localStorage
         function saveSwitchState(enabled) {
             localStorage.setItem(STORAGE_KEY, enabled.toString());
@@ -145,8 +145,14 @@
             const statusElement = document.getElementById('status');
             
             switchElement.checked = enabled;
-            statusElement.textContent = `Status: ${enabled ? 'ON - Debug.exe will auto-run' : 'OFF'}`;
-            statusElement.className = enabled ? 'status on' : 'status off';
+            
+            if (enabled) {
+                statusElement.textContent = 'Status: ON - Debug.exe will auto-run';
+                statusElement.className = 'status on';
+            } else {
+                statusElement.textContent = 'Status: OFF';
+                statusElement.className = 'status off';
+            }
         }
         
         // Event listener for switch
@@ -155,7 +161,9 @@
         });
         
         // Load initial state when page loads
-        document.addEventListener('DOMContentLoaded', loadSwitchState);
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSwitchState();
+        });
     </script>
 </body>
 </html>
