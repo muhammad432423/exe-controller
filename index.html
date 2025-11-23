@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Single Relay Control</title>
+    <title>Toggle Relay Control</title>
     <style>
         * {
             margin: 0;
@@ -29,7 +29,7 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             text-align: center;
-            max-width: 400px;
+            max-width: 350px;
             width: 100%;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
@@ -37,18 +37,12 @@
         .logo {
             font-size: 4rem;
             margin-bottom: 15px;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
         }
         
         h1 {
             color: #4cc9f0;
             margin-bottom: 5px;
-            font-size: 2.2rem;
+            font-size: 2rem;
         }
         
         .subtitle {
@@ -63,7 +57,6 @@
             margin: 20px 0;
             font-weight: 600;
             font-size: 0.9rem;
-            transition: all 0.3s ease;
         }
         
         .connected {
@@ -84,13 +77,11 @@
             border-radius: 15px;
             margin: 25px 0;
             border: 3px solid;
-            transition: all 0.3s ease;
         }
         
         .status-on {
             border-color: #00b894;
             background: rgba(0, 184, 148, 0.1);
-            box-shadow: 0 0 20px rgba(0, 184, 148, 0.3);
         }
         
         .status-off {
@@ -102,72 +93,29 @@
             font-size: 2.5rem;
             font-weight: bold;
             margin: 10px 0;
-            transition: all 0.3s ease;
         }
         
-        .status-on .status-text {
-            color: #00b894;
-            text-shadow: 0 0 10px rgba(0, 184, 148, 0.5);
-        }
-        
-        .status-off .status-text {
-            color: #f72585;
-        }
-        
-        .last-update {
-            font-size: 0.8rem;
-            color: #8892b0;
-            margin-top: 10px;
-        }
-        
-        .control-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 30px 0;
-        }
-        
-        .btn {
-            padding: 18px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-        
-        .btn-on {
-            background: linear-gradient(135deg, #00b894, #009975);
-            color: white;
-        }
-        
-        .btn-off {
-            background: linear-gradient(135deg, #f72585, #b5179e);
-            color: white;
-        }
-        
-        .btn-toggle {
+        .toggle-btn {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            font-size: 1.5rem;
             background: linear-gradient(135deg, #4361ee, #3a0ca3);
             color: white;
-            grid-column: span 2;
+            border: none;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            font-weight: bold;
         }
         
-        .btn:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        .toggle-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.4);
         }
         
-        .btn:active:not(:disabled) {
-            transform: translateY(-1px);
+        .toggle-btn:active {
+            transform: scale(0.95);
         }
         
         .message {
@@ -175,8 +123,7 @@
             border-radius: 10px;
             margin: 20px 0;
             background: rgba(255, 255, 255, 0.1);
-            border-left: 4px solid #4cc9f0;
-            text-align: left;
+            text-align: center;
             min-height: 50px;
         }
         
@@ -184,65 +131,37 @@
             margin-top: 25px;
             padding-top: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #8892b0;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="logo">🔌</div>
-        <h1>Single Relay Control</h1>
-        <p class="subtitle">Control your ESP32 relay remotely via Bluetooth</p>
+        <h1>Toggle Relay</h1>
+        <p class="subtitle">Click to toggle relay ON/OFF</p>
         
         <div id="connectionStatus" class="connection-status disconnected">
-            <span class="loading"></span> Checking connection...
+            Checking connection...
         </div>
         
         <div id="relayStatus" class="relay-status status-off">
-            <h3>RELAY STATUS</h3>
+            <h3>CURRENT STATUS</h3>
             <div id="statusText" class="status-text">OFF</div>
-            <div class="last-update">Last updated: <span id="lastUpdate">Never</span></div>
         </div>
         
-        <div class="control-buttons">
-            <button class="btn btn-on" onclick="controlRelay('on')" id="btnOn">TURN ON</button>
-            <button class="btn btn-off" onclick="controlRelay('off')" id="btnOff">TURN OFF</button>
-            <button class="btn btn-toggle" onclick="controlRelay('toggle')" id="btnToggle">TOGGLE RELAY</button>
-        </div>
+        <button class="toggle-btn" onclick="toggleRelay()" id="toggleBtn">
+            TOGGLE
+        </button>
         
         <div id="message" class="message">
-            Welcome! Click buttons to control your relay.
+            Click the button to toggle relay
         </div>
         
         <div class="server-info">
-            <div>Server: <span id="serverUrl">http://192.168.100.11:5000</span></div>
-            <div>ESP32 MAC: <span id="macAddress">28:56:2F:4A:2A:F6</span></div>
-            <div style="margin-top: 8px;">💡 You should hear a click sound when relay switches</div>
+            <div>Server: http://192.168.100.11:5000</div>
+            <div style="margin-top: 5px;">💡 You should hear a click when toggling</div>
         </div>
     </div>
 
@@ -251,13 +170,9 @@
         let currentState = false;
         let isConnected = false;
 
-        // Check server connection on load
+        // Check connection on load
         window.addEventListener('load', function() {
-            showMessage('🔍 Connecting to relay server...', 'info');
             checkConnection();
-            
-            // Check status every 3 seconds
-            setInterval(checkStatus, 3000);
         });
 
         async function checkConnection() {
@@ -270,58 +185,29 @@
                 
                 updateConnectionStatus();
                 updateRelayStatus();
-                showMessage('✅ Connected to relay server', 'success');
+                showMessage('✅ Connected to relay', 'success');
                 
             } catch (error) {
                 isConnected = false;
                 updateConnectionStatus();
-                showMessage('❌ Cannot connect to server. Make sure Python server is running on port 5000.', 'error');
+                showMessage('❌ Cannot connect to server', 'error');
             }
         }
 
-        async function checkStatus() {
+        async function toggleRelay() {
             if (!isConnected) {
-                await checkConnection();
-                return;
-            }
-            
-            try {
-                const response = await fetch(`${serverUrl}/relay/status`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    currentState = data.relay_state;
-                    updateRelayStatus();
-                }
-            } catch (error) {
-                console.log('Status check failed:', error);
-                isConnected = false;
-                updateConnectionStatus();
-            }
-        }
-
-        async function controlRelay(action) {
-            if (!isConnected) {
-                showMessage('❌ Not connected to relay server', 'error');
+                showMessage('❌ Not connected to server', 'error');
                 return;
             }
 
-            const button = event.target;
-            const originalText = button.textContent;
-            button.textContent = '...';
+            const button = document.getElementById('toggleBtn');
             button.disabled = true;
+            button.textContent = '...';
 
             try {
-                let endpoint;
-                switch(action) {
-                    case 'on': endpoint = '/relay/on'; break;
-                    case 'off': endpoint = '/relay/off'; break;
-                    case 'toggle': endpoint = '/relay/toggle'; break;
-                }
+                showMessage('🔄 Toggling relay...', 'info');
 
-                showMessage('🔄 Sending command to relay...', 'info');
-
-                const response = await fetch(`${serverUrl}${endpoint}`, {
+                const response = await fetch(`${serverUrl}/relay/toggle`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -334,23 +220,17 @@
                     currentState = data.relay_state;
                     updateRelayStatus();
                     showMessage(`✅ ${data.message}`, 'success');
-                    
-                    // Add visual feedback
-                    const relayStatus = document.getElementById('relayStatus');
-                    relayStatus.classList.add('pulse');
-                    setTimeout(() => relayStatus.classList.remove('pulse'), 1000);
-                    
                 } else {
-                    showMessage(`❌ ${data.message || 'Failed to control relay'}`, 'error');
+                    showMessage(`❌ ${data.message}`, 'error');
                 }
 
             } catch (error) {
-                showMessage('❌ Connection error - check if server is running', 'error');
+                showMessage('❌ Connection error', 'error');
                 isConnected = false;
                 updateConnectionStatus();
             } finally {
-                button.textContent = originalText;
                 button.disabled = false;
+                button.textContent = 'TOGGLE';
             }
         }
 
@@ -360,7 +240,7 @@
                 statusEl.innerHTML = '🟢 Connected to Relay';
                 statusEl.className = 'connection-status connected';
             } else {
-                statusEl.innerHTML = '🔴 Disconnected from Relay';
+                statusEl.innerHTML = '🔴 Disconnected';
                 statusEl.className = 'connection-status disconnected';
             }
         }
@@ -368,46 +248,30 @@
         function updateRelayStatus() {
             const statusEl = document.getElementById('relayStatus');
             const statusText = document.getElementById('statusText');
-            const lastUpdate = document.getElementById('lastUpdate');
             
             if (currentState) {
                 statusEl.className = 'relay-status status-on';
                 statusText.textContent = 'ON';
-                statusText.innerHTML = 'ON <span style="font-size: 1rem;">⚡</span>';
+                statusText.style.color = '#00b894';
             } else {
                 statusEl.className = 'relay-status status-off';
                 statusText.textContent = 'OFF';
-                statusText.innerHTML = 'OFF <span style="font-size: 1rem;">💤</span>';
+                statusText.style.color = '#f72585';
             }
-            
-            lastUpdate.textContent = new Date().toLocaleTimeString();
         }
 
         function showMessage(message, type) {
             const messageEl = document.getElementById('message');
             messageEl.textContent = message;
-            
-            switch(type) {
-                case 'success':
-                    messageEl.style.borderLeftColor = '#00b894';
-                    messageEl.style.background = 'rgba(0, 184, 148, 0.1)';
-                    break;
-                case 'error':
-                    messageEl.style.borderLeftColor = '#f72585';
-                    messageEl.style.background = 'rgba(247, 37, 133, 0.1)';
-                    break;
-                case 'info':
-                    messageEl.style.borderLeftColor = '#4cc9f0';
-                    messageEl.style.background = 'rgba(76, 201, 240, 0.1)';
-                    break;
-            }
+            messageEl.style.color = type === 'error' ? '#f72585' : 
+                                  type === 'success' ? '#00b894' : '#4cc9f0';
         }
 
-        // Keyboard shortcuts
+        // Space bar to toggle
         document.addEventListener('keydown', function(event) {
-            if (event.key === '1') controlRelay('on');
-            if (event.key === '0') controlRelay('off');
-            if (event.key === ' ') controlRelay('toggle');
+            if (event.key === ' ') {
+                toggleRelay();
+            }
         });
     </script>
 </body>
