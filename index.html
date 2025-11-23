@@ -240,7 +240,7 @@
         </div>
         
         <div class="server-info">
-            <div>Server: <span id="serverUrl">http://localhost:5000</span></div>
+            <div>Server: <span id="serverUrl">http://192.168.100.11:5000</span></div>
             <div>ESP32 MAC: <span id="macAddress">28:56:2F:4A:2A:F6</span></div>
             <div style="margin-top: 8px;">💡 You should hear a click sound when relay switches</div>
         </div>
@@ -256,8 +256,8 @@
             showMessage('🔍 Connecting to relay server...', 'info');
             checkConnection();
             
-            // Check status every 2 seconds
-            setInterval(checkStatus, 2000);
+            // Check status every 3 seconds
+            setInterval(checkStatus, 3000);
         });
 
         async function checkConnection() {
